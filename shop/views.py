@@ -15,24 +15,29 @@ def products_list_view(request):
     return Response(data=data)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'PUT', 'DELETE'])
 def products_detail_view(request, id):
     try:
         product = models.Product.objects.get(id=id)
     except models.Product.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
-    data = serializers.ProductDetailSerializer(product, many=True).data
+            
+    if request.method == 'PUT':
+        serializer = serializers.ProductDetailSerializer(product, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            
+            return Response(data=serializer.data)
+    
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == "DELETE":
+        product.delete()
+        return Response(data={"Product was delete"})
+    data = serializers.ProductDetailSerializer(product, many=False).data
     return Response(data=data)
-
-# @api_view(['PUT', 'DELETE'])
-# def products_datail_view(request, id):
-#     if request.method == 'PUT':
-#         pass
-#     elif request.method == "DELETE":
-#         product.delete()
-#         return Response(data={"Product was delete"})
-
-
+    
+    
 @api_view(['GET'])
 def products_reviews_view(request):
     products = models.Product.objects.all()
