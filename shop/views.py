@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from . import serializers
 from . import models
+from .serializers import ProductDetailSerializer, ProductCreateSerializer, ProductListSerializer, ProductReviewSerializer, ProductTagsSerializer
 
 
 @api_view(['GET'])
@@ -50,10 +51,6 @@ def products_tags_view(request):
     products = models.Product.objects.all()
     data = serializers.ProductTagsSerializer(products, many=True).data
     return Response(data=data)
-
-
-
-
 
 
 
